@@ -26,7 +26,7 @@ server:
 spring:
   application:
     # 应用名
-    name: chat
+    name: lock
   # Mysql配置
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/db_lock?autoReconnect=true&useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=CONVERT_TO_NULL&useSSL=false&serverTimezone=CTT&nullCatalogMeansCurrent=true

@@ -12,4 +12,7 @@ import net.javadog.lock.entity.Device;
  **/
 public interface DeviceService extends IService<Device> {
     void updateDevice(Long deviceId);
+
+
+    void updateDeviceByLock(Long deviceId);
 }

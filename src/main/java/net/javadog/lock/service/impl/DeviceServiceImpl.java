@@ -20,9 +20,16 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
     public void updateDevice(Long deviceId) {
         LambdaUpdateWrapper<Device> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(Device::getId, deviceId);
-        updateWrapper.set(Device::getUseTimes, 5);
-        // updateWrapper.setSql("use_times = use_times + 1"); // 将age字段的值加1
+        updateWrapper.setSql("use_times = use_times + 1");
         final boolean update = this.update(updateWrapper);
-        System.out.println("update" + update);
+    }
+
+    @Override
+    public void updateDeviceByLock(Long deviceId) {
+        Device device = this.getById(deviceId);
+        LambdaUpdateWrapper<Device> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Device::getId, deviceId);
+        updateWrapper.set(Device::getUseTimes, device.getUseTimes()+1);
+        final boolean update = this.update(updateWrapper);
     }
 }
