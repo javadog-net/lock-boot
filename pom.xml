@@ -20,9 +20,16 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- mybatis-plus -->
         <mybatis-plus.version>3.4.1</mybatis-plus.version>
+        <!-- hutool Java工具库 -->
         <hutool.version>5.7.20</hutool.version>
+        <!-- mysql -->
         <mysql.version>8.0.22</mysql.version>
+        <!-- springdoc swagger整合工具-->
+        <springdoc.version>1.6.15</springdoc.version>
+        <!-- knife4j 集Swagger2和OpenAPI3 为一体的增强解决方案-->
+        <knife4j.version>4.3.0</knife4j.version>
     </properties>
 
     <dependencies>
@@ -60,6 +67,16 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>${mybatis-plus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-openapi3-spring-boot-starter</artifactId>
+            <version>${knife4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
