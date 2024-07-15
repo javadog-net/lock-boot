@@ -7,6 +7,9 @@ import net.javadog.lock.entity.Device;
 import net.javadog.lock.service.DeviceService;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * 设备-实现类
  *
@@ -16,20 +19,39 @@ import org.springframework.stereotype.Service;
  **/
 @Service
 public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> implements DeviceService {
-    @Override
-    public void updateDevice(Long deviceId) {
-        LambdaUpdateWrapper<Device> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(Device::getId, deviceId);
-        updateWrapper.setSql("use_times = use_times + 1");
-        final boolean update = this.update(updateWrapper);
-    }
 
+    Lock lock = new ReentrantLock();
     @Override
-    public void updateDeviceByLock(Long deviceId) {
+    public void updateDeviceNormal(Long deviceId) {
         Device device = this.getById(deviceId);
         LambdaUpdateWrapper<Device> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(Device::getId, deviceId);
         updateWrapper.set(Device::getUseTimes, device.getUseTimes()+1);
-        final boolean update = this.update(updateWrapper);
+        this.update(updateWrapper);
+    }
+
+    @Override
+    public void updateDeviceByLock(Long deviceId) {
+        lock.lock();
+        Device device = this.getById(deviceId);
+        LambdaUpdateWrapper<Device> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Device::getId, deviceId);
+        updateWrapper.set(Device::getUseTimes, device.getUseTimes()+1);
+        try {
+            this.update(updateWrapper);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            lock.unlock();
+        }
+
+    }
+
+    @Override
+    public void updateDeviceByAtomicity(Long deviceId) {
+        LambdaUpdateWrapper<Device> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Device::getId, deviceId);
+        updateWrapper.setSql("use_times = use_times + 1");
+        this.update(updateWrapper);
     }
 }

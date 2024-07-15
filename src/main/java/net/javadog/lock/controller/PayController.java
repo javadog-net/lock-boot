@@ -1,5 +1,7 @@
 package net.javadog.lock.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import net.javadog.lock.service.DeviceService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +19,7 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("/pay")
+@Tag(name = "支付-控制器")
 public class PayController {
 
     private DeviceService deviceService;
@@ -26,28 +29,45 @@ public class PayController {
         this.deviceService = deviceService;
     }
 
-    @GetMapping("/success")
-    public void paySuccess(@RequestParam Long deviceId){
-        // 模拟是个10线程
+    @GetMapping("/A")
+    @Operation(summary = "方式A-更新设备-普通方法(会出现超卖)")
+    public void payA(@RequestParam Long deviceId) throws InterruptedException {
         for(int i=0; i<100; i++){
-            // 创建线程
+            // 暂停20毫秒，模拟不同时间，不同人请求并发
+            Thread.sleep(20);
+            // 模拟是个100线程
             new Thread(() -> {
-                for(int j=0; j<10; j++){
-                    deviceService.updateDevice(deviceId);
-                }
+                // 更新设备-普通方法
+                deviceService.updateDeviceNormal(deviceId);
             }).start();
         }
     }
 
-    @GetMapping("/lock")
-    public void payLock(@RequestParam Long deviceId){
+    @GetMapping("/B")
+    @Operation(summary = "方式B-更新设备-使用ReentrantLock(不会出现超卖)")
+    public void payB(@RequestParam Long deviceId) throws InterruptedException {
         // 模拟是个10线程
-        for(int i=0; i<10; i++){
+        for(int i=0; i<100; i++){
+            // 暂停20毫秒，模拟不同时间，不同人请求并发
+            Thread.sleep(20);
             // 创建线程
             new Thread(() -> {
-                for(int j=0; j<10; j++){
-                    deviceService.updateDeviceByLock(deviceId);
-                }
+                // 更新设备-使用ReentrantLock。
+                deviceService.updateDeviceByLock(deviceId);
+            }).start();
+        }
+    }
+
+    @GetMapping("/C")
+    @Operation(summary = "方式C-更新设备-使用原子性更新(不会出现超卖)")
+    public void payC(@RequestParam Long deviceId) throws InterruptedException {
+        for(int i=0; i<100; i++){
+            // 暂停20毫秒，模拟不同时间，不同人请求并发
+            Thread.sleep(20);
+            // 模拟是个100线程
+            new Thread(() -> {
+                // 更新-使用原子性更新
+                deviceService.updateDeviceByAtomicity(deviceId);
             }).start();
         }
     }

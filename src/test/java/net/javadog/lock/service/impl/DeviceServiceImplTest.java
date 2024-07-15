@@ -9,8 +9,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 /**
  * @author: hdx
  * @Date: 2024-07-05 17:04
@@ -34,7 +32,7 @@ class DeviceServiceImplTest {
             // 创建线程
             new Thread(() -> {
                 try {
-                    deviceService.updateDevice(1L);
+                    deviceService.updateDeviceNormal(1L);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

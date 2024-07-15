@@ -11,8 +11,26 @@ import net.javadog.lock.entity.Device;
  * @version: 1.0
  **/
 public interface DeviceService extends IService<Device> {
-    void updateDevice(Long deviceId);
 
+    /**
+     * 更新设备-普通方法。
+     *
+     * @param deviceId 设备的唯一标识符。用于确定要更新状态的特定设备。
+     */
+    void updateDeviceNormal(Long deviceId);
 
+    /**
+     * 更新设备-使用ReentrantLock。
+     *
+     * @param deviceId 设备的唯一标识符。用于确定要更新状态的特定设备。
+     */
     void updateDeviceByLock(Long deviceId);
+
+    /**
+     * 更新设备-使用原子性更新。
+     *
+     * @param deviceId 设备的唯一标识符。用于确定要更新状态的特定设备。
+     */
+    void updateDeviceByAtomicity(Long deviceId);
+
 }
