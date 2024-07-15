@@ -6,6 +6,7 @@ import net.javadog.lock.dao.DeviceMapper;
 import net.javadog.lock.entity.Device;
 import net.javadog.lock.service.DeviceService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -44,7 +45,6 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
         } finally {
             lock.unlock();
         }
-
     }
 
     @Override
@@ -53,5 +53,22 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
         updateWrapper.eq(Device::getId, deviceId);
         updateWrapper.setSql("use_times = use_times + 1");
         this.update(updateWrapper);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateDeviceByTansaction(Long deviceId) {
+        lock.lock();
+        Device device = this.getById(deviceId);
+        LambdaUpdateWrapper<Device> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Device::getId, deviceId);
+        updateWrapper.set(Device::getUseTimes, device.getUseTimes()+1);
+        try {
+            this.update(updateWrapper);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            lock.unlock();
+        }
     }
 }

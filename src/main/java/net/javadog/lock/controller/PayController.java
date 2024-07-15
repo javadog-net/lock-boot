@@ -71,4 +71,18 @@ public class PayController {
             }).start();
         }
     }
+
+    @GetMapping("/D")
+    @Operation(summary = "方式D-更新设备-使用事务套锁(锁失效)")
+    public void payD(@RequestParam Long deviceId) throws InterruptedException {
+        for(int i=0; i<100; i++){
+            // 暂停20毫秒，模拟不同时间，不同人请求并发
+            Thread.sleep(20);
+            // 模拟是个100线程
+            new Thread(() -> {
+                // 更新-使用原子性更新
+                deviceService.updateDeviceByTansaction(deviceId);
+            }).start();
+        }
+    }
 }
