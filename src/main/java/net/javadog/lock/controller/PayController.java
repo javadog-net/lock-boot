@@ -44,7 +44,7 @@ public class PayController {
     }
 
     @GetMapping("/B")
-    @Operation(summary = "方式B-更新设备-使用ReentrantLock(不会出现超卖)")
+    @Operation(summary = "方式B-更新设备-使用ReentrantLock(锁正常-不会出现超卖)")
     public void payB(@RequestParam Long deviceId) throws InterruptedException {
         // 模拟是个10线程
         for(int i=0; i<100; i++){
@@ -52,28 +52,28 @@ public class PayController {
             Thread.sleep(20);
             // 创建线程
             new Thread(() -> {
-                // 更新设备-使用ReentrantLock。
+                // 更新设备-使用ReentrantLock
                 deviceService.updateDeviceByLock(deviceId);
             }).start();
         }
     }
 
     @GetMapping("/C")
-    @Operation(summary = "方式C-更新设备-使用原子性更新(不会出现超卖)")
+    @Operation(summary = "方式C-更新设备-使用事务套锁(锁失效)")
     public void payC(@RequestParam Long deviceId) throws InterruptedException {
         for(int i=0; i<100; i++){
             // 暂停20毫秒，模拟不同时间，不同人请求并发
             Thread.sleep(20);
             // 模拟是个100线程
             new Thread(() -> {
-                // 更新-使用原子性更新
-                deviceService.updateDeviceByAtomicity(deviceId);
+                // 更新-使用事务套锁
+                deviceService.updateDeviceByTansaction(deviceId);
             }).start();
         }
     }
 
     @GetMapping("/D")
-    @Operation(summary = "方式D-更新设备-使用事务套锁(锁失效)")
+    @Operation(summary = "方式D-更新设备-缩小事务方法(锁正常-不会出现超卖)")
     public void payD(@RequestParam Long deviceId) throws InterruptedException {
         for(int i=0; i<100; i++){
             // 暂停20毫秒，模拟不同时间，不同人请求并发
@@ -81,7 +81,7 @@ public class PayController {
             // 模拟是个100线程
             new Thread(() -> {
                 // 更新-使用原子性更新
-                deviceService.updateDeviceByTansaction(deviceId);
+                deviceService.updateDeviceByReduce(deviceId);
             }).start();
         }
     }

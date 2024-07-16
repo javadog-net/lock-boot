@@ -33,6 +33,7 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
 
     @Override
     public void updateDeviceByLock(Long deviceId) {
+        // 加锁
         lock.lock();
         Device device = this.getById(deviceId);
         LambdaUpdateWrapper<Device> updateWrapper = new LambdaUpdateWrapper<>();
@@ -43,21 +44,15 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
+            // 解锁
             lock.unlock();
         }
-    }
-
-    @Override
-    public void updateDeviceByAtomicity(Long deviceId) {
-        LambdaUpdateWrapper<Device> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(Device::getId, deviceId);
-        updateWrapper.setSql("use_times = use_times + 1");
-        this.update(updateWrapper);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateDeviceByTansaction(Long deviceId) {
+        // 加锁
         lock.lock();
         Device device = this.getById(deviceId);
         LambdaUpdateWrapper<Device> updateWrapper = new LambdaUpdateWrapper<>();
@@ -68,7 +63,30 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
+            // 解锁
             lock.unlock();
         }
+    }
+
+    @Override
+    public void updateDeviceByReduce(Long deviceId) {
+        try {
+            // 加锁
+            lock.lock();
+            this.updateDevice(deviceId);
+        } finally {
+            // 解锁
+            lock.unlock();
+        }
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public void updateDevice(Long deviceId){
+        Device device = this.getById(deviceId);
+        LambdaUpdateWrapper<Device> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Device::getId, deviceId);
+        updateWrapper.set(Device::getUseTimes, device.getUseTimes()+1);
+        this.update(updateWrapper);
     }
 }
