@@ -73,7 +73,7 @@ public class PayController {
     }
 
     @GetMapping("/D")
-    @Operation(summary = "方式D-更新设备-缩小事务方法(锁正常-不会出现超卖)")
+    @Operation(summary = "方式D-更新设备-缩小事务边界方法(锁正常-不会出现超卖)")
     public void payD(@RequestParam Long deviceId) throws InterruptedException {
         for(int i=0; i<100; i++){
             // 暂停20毫秒，模拟不同时间，不同人请求并发

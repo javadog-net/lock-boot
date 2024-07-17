@@ -21,7 +21,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @Service
 public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> implements DeviceService {
 
-    Lock lock = new ReentrantLock();
+
     @Override
     public void updateDeviceNormal(Long deviceId) {
         Device device = this.getById(deviceId);
@@ -30,6 +30,8 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
         updateWrapper.set(Device::getUseTimes, device.getUseTimes()+1);
         this.update(updateWrapper);
     }
+
+    Lock lock = new ReentrantLock();
 
     @Override
     public void updateDeviceByLock(Long deviceId) {
@@ -79,7 +81,6 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
             lock.unlock();
         }
     }
-
 
     @Transactional(rollbackFor = Exception.class)
     public void updateDevice(Long deviceId){
